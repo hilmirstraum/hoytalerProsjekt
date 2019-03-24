@@ -1,0 +1,41 @@
+#include <ESP8266WiFi.h>
+const char* host = "www.yr.no";
+String url = "/place/Norway/Oslo/Oslo/Kværnerveien/varsel.xml";
+
+String message = "";
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  WiFiClient client;
+  const int httpPort = 80;
+  if (!client.connect(host, httpPort)) {
+    //connection failed
+    return;
+  }
+
+
+
+
+  Serial.print("Requesting URL: ");
+  //henter xml kode fra yr
+      // This will send the request to the server
+      client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+                   "Host: " + host + "\r\n" +
+                   "Connection: close\r\n\r\n");
+      delay(2000);
+
+  //leser av xml kode
+  while(client.available()){
+    char c = client.read();
+    message += c;
+
+  }
+  Serial.println(message);
+  delay(100000);
+}
