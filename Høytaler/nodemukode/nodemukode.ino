@@ -7,8 +7,16 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-char ssid = "AirTies_Air4920_7339";
-char password = "kwfktm7839";
+//for komunikasjon med arduinoen
+#include <SoftwareSerial.h>
+#define rxpin 2 //D4
+#define txpin 0 //D3
+SoftwareSerial mySerial = SoftwareSerial(rxpin, txpin);
+int volume = 0; //verdien som kommer via serial porten er volumet som skal vises på skjermen
+
+
+char* ssid = "AirTies_Air4920_7339";
+char* password = "kwfktm7839";
 
 
 //skaper et objekt for skjermen
@@ -262,12 +270,16 @@ WeatherForecast weatherForecast("/place/Norway/Oslo/Oslo/Kværnerveien/varsel.xm
 
 
 void setup() {
+  Serial.begin(9600); //for feilmeldinger
+  mySerial.begin(9600); //for komunikasjon med arduinoen
+
   //kobler til wifi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED){} //sikrer at man ikke går videre med koden før wifi er koblet til
+  if (WiFi.status() != WL_CONNECTED){
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED){Serial.println("not connected to wifi"); yield();} //sikrer at man ikke går videre med koden før wifi er koblet til
+    }
 
 
-  Serial.begin(9600); //for testing og feilmeldinger
 
   //gjør klar skjermen
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -278,16 +290,24 @@ void setup() {
 void loop() {
   weatherForecast.opperate(); //henter værdata
 
+  //lser av verdien arduinoen sender
+  if (mySerial.available()){
+    volume = mySerial.read();
+  }
+
+
+
   //skriver ut til skjermen
   display.clearDisplay(); //fjerner all informasjon på skjermen
-  display.setTextSize(3);      // størelsen på teksten
+  display.setTextSize(2);      // størelsen på teksten
   display.setTextColor(WHITE); // Draw white text
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);
   display.print(F("grader:"));
-  display.println(F("weatherForecast.temperature1"));
-  display.println(F("weatherForecast.weather1"));
+  Serial.println(weatherForecast.temperature1);
+  display.println(weatherForecast.weather1);
   display.print(F("volume"));
+  display.print(volume);
   //display.print(F(volume)) //gis fra arduinoen via serial port mest sannynlig
   display.display(); //oppdaterer skjermen
 

@@ -1,0 +1,3 @@
+tid for pause signal å bli regristert 110 milisekund
+
+tid fra min til maks volum 4,5 sekunder

@@ -273,6 +273,7 @@ if(loopCounter==0){
   Serial.println("wheter2: "+ weather2);
   Serial.println("temeperatur1: "+ temperature1);
   Serial.println("temperature2:"+ temperature2);
+  Serial.println("alertrain" + alertRain);
 
  } //end loopcounter
 
