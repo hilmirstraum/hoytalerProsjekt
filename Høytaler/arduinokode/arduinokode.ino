@@ -1,9 +1,16 @@
-void setup() {
-  // put your setup code here, to run once:
+#include <SoftwareSerial.h>
 
+#define rxpin 3 //D4
+#define txpin 2 //D3
+
+SoftwareSerial mySerial = SoftwareSerial(rxpin, txpin);
+
+void setup(){
+  pinMode(rxpin, INPUT);
+  pinMode(txpin, OUTPUT);
+  mySerial.begin(9600);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop(){
 
 }
