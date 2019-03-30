@@ -8,7 +8,7 @@ int const maxDistance = 100;
 int const minDistance = 10;
 
 int const changeVolumeSensitivity = 1;
-float volume;
+float newVolume;
 float originalVolume;
 
 float handInside[] = {0, 0};
@@ -62,19 +62,22 @@ void loop(){
   else if (handInside[0] == 0){
     handInside[0] = 1;
     handInside[1] = averageDistance;
-    originalVolume = volume;}
+    originalVolume = newVolume;}
   }
-  //regner ut endringen i volumet
+  //regner ut endringen i newVolumet
   if (handInside[0] == 1){
-    volume = originalVolume + (averageDistance - handInside[1])*changeVolumeSensitivity;
-    //sørger for at volumet ikke går utenfor 0-100
-    if (volume > 100){
-      volume = 100;}
-    else if (volume < 0){
-      volume = 0;}}
+    newVolume = originalVolume + (averageDistance - handInside[1])*changeVolumeSensitivity;
+    //sørger for at newVolumet ikke går utenfor 0-100
+    if (newVolume > 100){
+      newVolume = 100;}
+    else if (newVolume < 0){
+      newVolume = 0;}}A
 
   //skriver ut verdiene
-  Serial.println(volume);
+  /*Serial.print("volume: ");
+  Serial.print(volume);
+  Serial.print(" originalVolume: ");
+  Serial.println(originalVolume);*/
   /*for (int i = 0; i<11; i++){
     if (i != 10){
       Serial.print(distance[i]);
