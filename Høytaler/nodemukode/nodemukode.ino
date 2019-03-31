@@ -11,9 +11,10 @@
 #include <SoftwareSerial.h>
 #define rxpin 2 //D4
 #define txpin 0 //D3
-SoftwareSerial mySerial = SoftwareSerial(rxpin, txpin);
+SoftwareSerial softSerial = SoftwareSerial(rxpin, txpin);
 int volume = 0; //verdien som kommer via serial porten er volumet som skal vises på skjermen
-
+int lastVolume = 0;
+String serialInfo = ""; //informasjon som sendes via serialporten
 
 char* ssid = "AirTies_Air4920_7339";
 char* password = "kwfktm7839";
@@ -271,7 +272,7 @@ WeatherForecast weatherForecast("/place/Norway/Oslo/Oslo/Kværnerveien/varsel.xm
 
 void setup() {
   Serial.begin(9600); //for feilmeldinger
-  mySerial.begin(9600); //for komunikasjon med arduinoen
+  softSerial.begin(9600); //for komunikasjon med arduinoen
 
   //kobler til wifi
   if (WiFi.status() != WL_CONNECTED){
@@ -279,21 +280,56 @@ void setup() {
     while (WiFi.status() != WL_CONNECTED){Serial.println("not connected to wifi"); yield();} //sikrer at man ikke går videre med koden før wifi er koblet til
     }
 
-
-
   //gjør klar skjermen
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
 
+
+  //viser ip addressen på skjermen helt til ultralydsensoren registrer at hånden er over sensoren
+  boolean showIpAddress = true;
+  while (showIpAddress){
+    if (softSerial.available()>0){
+      serialInfo = softSerial.readStringUntil('\n');
+    }
+    if (serialInfo.indexOf("stop ip") != -1){showIpAddress = false;} //stopper å vise det på skjermen vis ultralydsensoren blir aktivert
+
+    //legge til kode for å stoppe det hvis man kobler til appen
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //ta med: softSerial.println("appConnected");
+
+    display.clearDisplay(); //fjerner all informasjon på skjermen
+    display.setTextSize(2);      // størelsen på teksten
+    display.setTextColor(WHITE); // Draw white text
+    display.setCursor(0, 0);     // Start at top-left corner
+    display.cp437(true);
+    //display.println("ip: " + wifi.localIP());
+    display.println("ip");
+    display.println(WiFi.localIP());
+    display.display();
+  }
+  display.clearDisplay();
+  display.display();
 }
 
 void loop() {
   weatherForecast.opperate(); //henter værdata
 
-  //lser av verdien arduinoen sender
-  if (mySerial.available()){
-    volume = mySerial.read();
-  }
+  //seral kommunikasjon med arduinoen
+  if (softSerial.available()>0){
+    serialInfo = softSerial.readStringUntil('\n');}
+
+  //sjekker om informasjonen som ble sent er en volum oppdatering
+  if (serialInfo.indexOf("volume:")!= -1){
+  volume = serialInfo.substring(7 + serialInfo.indexOf("volume:")).toInt();
+  lastVolume = volume;
+  /*putt in kode for å oppdatere  volumet til mobilen
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  putt in kode for å oppdatere  volumet til mobilen*/}
+
+  //oppdaterer volumet til arduinoen hvis noe et annet sted i koden har endret på volumet
+  if (lastVolume != volume){
+    softSerial.println(volume);
+    lastVolume = volume;}
 
 
 

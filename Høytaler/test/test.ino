@@ -3,6 +3,7 @@
 #define echoPin 8
 #define trigerPin 7
 int const playPin = 4;
+boolean appConnected = false;
 
 int volume = 100; //volumet i prosent
 int newVolume = 100;
@@ -34,16 +35,12 @@ void setup(){
 
 void loop(){
 
-  //justering av volumet på Bluethootkortet
+  /*justering av volumet på Bluethootkortet
+  -----------------------------------------
+  -----------------------------------------
+  -----------------------------------------*/
+  if (appConnected == false){
   if (volume != newVolume && volumeChangeStartTime == 0){
-    /*if (volume < newVolume){
-      digitalWrite(volumeUp, HIGH);
-      delay(2000);
-    }
-    else{
-      digitalWrite(volumeDown, HIGH);
-      delay(2000);
-    }*/
     volumeChangeStartTime = millis();} //starter en klokke som forteller når vi startet å endre volumet
 
   if (newVolume < volume){
@@ -63,7 +60,15 @@ void loop(){
       volume = newVolume;
       if (newVolume == 100){}
       digitalWrite(volumeUp, LOW);
-      volumeChangeStartTime = 0;}}
+      volumeChangeStartTime = 0;}}}
+
+    /*håndtering av kommunikasjon med Nodemcuen
+    -------------------------------------------
+    -------------------------------------------
+    -------------------------------------------*/
+    if (Serial.available() > 0){
+
+    }
 
 
     /*testing
