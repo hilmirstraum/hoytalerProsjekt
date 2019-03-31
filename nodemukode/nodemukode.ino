@@ -15,9 +15,10 @@ SoftwareSerial softSerial = SoftwareSerial(rxpin, txpin);
 int volume = 0; //verdien som kommer via serial porten er volumet som skal vises på skjermen
 int lastVolume = 0;
 String serialInfo = ""; //informasjon som sendes via serialporten
+WiFiServer server(80);
 
-char* ssid = "AirTies_Air4920_7339";
-char* password = "kwfktm7839";
+char* ssid = "ARRIS-B692";
+char* password = "1CFC1251C0269E58";
 
 
 //skaper et objekt for skjermen
@@ -284,6 +285,10 @@ void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
 
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
+  Serial.println(WiFi.localIP());
 
   //viser ip addressen på skjermen helt til ultralydsensoren registrer at hånden er over sensoren
   boolean showIpAddress = true;
@@ -312,7 +317,14 @@ void setup() {
 }
 
 void loop() {
-  weatherForecast.opperate(); //henter værdata
+ // weatherForecast.opperate(); //henter værdata
+
+  //Sjekker om en client har kobla til
+  WiFiClient client = server.available();
+  if (!client) {
+    return;
+  }
+  softSerial.println("appConnected");
 
   //seral kommunikasjon med arduinoen
   if (softSerial.available()>0){
@@ -325,6 +337,33 @@ void loop() {
   /*putt in kode for å oppdatere  volumet til mobilen
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   putt in kode for å oppdatere  volumet til mobilen*/}
+
+  // Venter til at klienten ha send noe data
+  while(!client.available()){
+    delay(1);
+  }
+
+  String req = client.readStringUntil('\r');
+  client.flush();
+
+  // Ser på dataen og sender de riktige kommandoene
+  if (req.indexOf("/cmd/MUSIC_START") != -1)  // led=on
+    softSerial.println("play");
+  else if (req.indexOf("/cmd/MUSIC_STOP") != -1)
+    softSerial.println("plause");
+  else if(req.indexOf("/cmd/MUSIC_NEXT") != -1)
+    softSerial.println("next song");
+  else if(req.indexOf("/cmd/MUSIC_PREVIOUS") != -1)
+    softSerial.println("last song");
+  else {
+    Serial.println("invalid request");
+    client.stop();
+    return;
+  }
+
+  // printer ut svar
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
 
   //oppdaterer volumet til arduinoen hvis noe et annet sted i koden har endret på volumet
   if (lastVolume != volume){
@@ -340,8 +379,8 @@ void loop() {
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);
   display.print(F("grader:"));
-  Serial.println(weatherForecast.temperature1);
-  display.println(weatherForecast.weather1);
+//  Serial.println(weatherForecast.temperature1);
+//  display.println(weatherForecast.weather1);
   display.print(F("volume"));
   display.print(volume);
   //display.print(F(volume)) //gis fra arduinoen via serial port mest sannynlig
