@@ -1,12 +1,15 @@
 #include <SoftwareSerial.h>
 
-#define volumeDown 2
-#define volumeUp 3
-#define echoPin 8
-#define trigerPin 7
+#define volumeDown 4
+#define volumeUp 5
+#define echoPin 12
+#define trigerPin 13
 #define rxPin 3
 #define txPin 2
-int const playPin = 4;
+#define skipSong 7
+#define lastSong 8
+#define playPin 6
+
 
 boolean sendtIpStopMessage = false;
 
@@ -66,6 +69,18 @@ void loop(){
     delay(400); //Bluethootkortet bruker ca 105 ms på å registrere at musikken pauses.
     digitalWrite(playPin, LOW);
   }
+
+  else if (serialInfo.indexOf("skip song") != -1){ //hopper til neste sang
+    digitalWrite(skipSong, HIGH);
+    delay(200);
+    digitalWrite(lastSong, LOW);
+  }
+  else if (serialInfo.indexOf("last song") != -1){ //går til forrige sang
+    digitalWrite(skipSong, HIGH);
+    delay(200);
+    digitalWrite(lastSong, LOW);
+  }
+
 
   //sender info om at man skal stoppe å vise ip addressen hvis noe er over ultralydsensoren
   if (appConnected == false && averageDistance < 100 && averageDistance != 0 && sendtIpStopMessage == false){
