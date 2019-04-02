@@ -317,7 +317,7 @@ void setup() {
 }
 
 void loop() {
- // weatherForecast.opperate(); //henter værdata
+  weatherForecast.opperate(); //henter værdata
 
   //Sjekker om en client har kobla til
   WiFiClient client = server.available();
@@ -383,7 +383,6 @@ void loop() {
   display.println(weatherForecast.weather1);
   display.print(F("volume: "));
   display.print(volume);
-  //display.print(F(volume)) //gis fra arduinoen via serial port mest sannynlig
   display.display(); //oppdaterer skjermen
 
 }
