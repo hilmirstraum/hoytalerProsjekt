@@ -320,7 +320,11 @@ void setup() {
 }
 
 void loop() {
+<<<<<<< HEAD
 //  weatherForecast.opperate(); //henter værdata
+=======
+  weatherForecast.opperate(); //henter værdata
+>>>>>>> ec72ddb29426f708690b018cd40eaac4185a3248
 
   //Sjekker om en client har kobla til
   WiFiClient client = server.available();
@@ -362,6 +366,7 @@ void loop() {
 
   if (req.indexOf("/cmd/MUSIC_START") != -1){
     softSerial.println("play");
+<<<<<<< HEAD
     Serial.println("Play");
   }
   else if (req.indexOf("/cmd/MUSIC_STOP") != -1){
@@ -369,6 +374,11 @@ void loop() {
     Serial.println("Pause");
   }
   else if(req.indexOf("/cmd/MUSIC_NEXT") != -1){
+=======
+  else if (req.indexOf("/cmd/MUSIC_STOP") != -1)
+    softSerial.println("pause");
+  else if(req.indexOf("/cmd/MUSIC_NEXT") != -1)
+>>>>>>> ec72ddb29426f708690b018cd40eaac4185a3248
     softSerial.println("next song");
     Serial.println("Nxt song");
   }
@@ -400,11 +410,10 @@ void loop() {
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);
   display.print(F("grader:"));
-//  Serial.println(weatherForecast.temperature1);
-//  display.println(weatherForecast.weather1);
-  display.print(F("volume"));
+  display.println(weatherForecast.temperature1);
+  display.println(weatherForecast.weather1);
+  display.print(F("volume: "));
   display.print(volume);
-  //display.print(F(volume)) //gis fra arduinoen via serial port mest sannynlig
   display.display(); //oppdaterer skjermen
 
 }
