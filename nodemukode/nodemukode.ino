@@ -17,8 +17,8 @@ int lastVolume = 0;
 String serialInfo = ""; //informasjon som sendes via serialporten
 WiFiServer server(80);
 
-char* ssid = "ARRIS-B692";
-char* password = "1CFC1251C0269E58";
+char* ssid = "HilmirNett";
+char* password = "12345678";
 
 
 //skaper et objekt for skjermen
@@ -296,7 +296,10 @@ void setup() {
     if (softSerial.available()>0){
       serialInfo = softSerial.readStringUntil('\n');
     }
-    if (serialInfo.indexOf("stop ip") != -1){showIpAddress = false;} //stopper å vise det på skjermen vis ultralydsensoren blir aktivert
+    if (serialInfo.indexOf("stop ip") != -1){
+      showIpAddress = false;
+
+    } //stopper å vise det på skjermen vis ultralydsensoren blir aktivert
 
     //legge til kode for å stoppe det hvis man kobler til appen
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -317,18 +320,22 @@ void setup() {
 }
 
 void loop() {
- // weatherForecast.opperate(); //henter værdata
+//  weatherForecast.opperate(); //henter værdata
 
   //Sjekker om en client har kobla til
   WiFiClient client = server.available();
   if (!client) {
     return;
+  }else{
+    Serial.println("YES");
   }
   softSerial.println("appConnected");
+  Serial.println("appConnected");
 
   //seral kommunikasjon med arduinoen
   if (softSerial.available()>0){
-    serialInfo = softSerial.readStringUntil('\n');}
+    serialInfo = softSerial.readStringUntil('\n');
+  }
 
   //sjekker om informasjonen som ble sent er en volum oppdatering
   if (serialInfo.indexOf("volume:")!= -1){
@@ -336,7 +343,8 @@ void loop() {
   lastVolume = volume;
   /*putt in kode for å oppdatere  volumet til mobilen
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  putt in kode for å oppdatere  volumet til mobilen*/}
+  putt in kode for å oppdatere  volumet til mobilen*/
+  }
 
   // Venter til at klienten ha send noe data
   while(!client.available()){
@@ -347,14 +355,27 @@ void loop() {
   client.flush();
 
   // Ser på dataen og sender de riktige kommandoene
-  if (req.indexOf("/cmd/MUSIC_START") != -1)  // led=on
+  Serial.println("Music Start: " + req.indexOf("/cmd/MUSIC_START"));
+  Serial.println("Music Stop: " + req.indexOf("/cmd/MUSIC_STOP"));
+  Serial.println("Music next: " + req.indexOf("/cmd/MUSIC_NEXT"));
+  Serial.println("Music start: " + req.indexOf("/cmd/MUSIC_PREVIOUS"));
+
+  if (req.indexOf("/cmd/MUSIC_START") != -1){
     softSerial.println("play");
-  else if (req.indexOf("/cmd/MUSIC_STOP") != -1)
+    Serial.println("Play");
+  }
+  else if (req.indexOf("/cmd/MUSIC_STOP") != -1){
     softSerial.println("plause");
-  else if(req.indexOf("/cmd/MUSIC_NEXT") != -1)
+    Serial.println("Pause");
+  }
+  else if(req.indexOf("/cmd/MUSIC_NEXT") != -1){
     softSerial.println("next song");
-  else if(req.indexOf("/cmd/MUSIC_PREVIOUS") != -1)
+    Serial.println("Nxt song");
+  }
+  else if(req.indexOf("/cmd/MUSIC_PREVIOUS") != -1){
     softSerial.println("last song");
+    Serial.println("last nong");
+  }
   else {
     Serial.println("invalid request");
     client.stop();
