@@ -350,7 +350,7 @@ void loop() {
   if (req.indexOf("/cmd/MUSIC_START") != -1)  // led=on
     softSerial.println("play");
   else if (req.indexOf("/cmd/MUSIC_STOP") != -1)
-    softSerial.println("plause");
+    softSerial.println("pause");
   else if(req.indexOf("/cmd/MUSIC_NEXT") != -1)
     softSerial.println("next song");
   else if(req.indexOf("/cmd/MUSIC_PREVIOUS") != -1)
@@ -379,9 +379,9 @@ void loop() {
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);
   display.print(F("grader:"));
-//  Serial.println(weatherForecast.temperature1);
-//  display.println(weatherForecast.weather1);
-  display.print(F("volume"));
+  display.println(weatherForecast.temperature1);
+  display.println(weatherForecast.weather1);
+  display.print(F("volume: "));
   display.print(volume);
   //display.print(F(volume)) //gis fra arduinoen via serial port mest sannynlig
   display.display(); //oppdaterer skjermen
