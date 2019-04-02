@@ -320,11 +320,8 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
-//  weatherForecast.opperate(); //henter værdata
-=======
+
   weatherForecast.opperate(); //henter værdata
->>>>>>> ec72ddb29426f708690b018cd40eaac4185a3248
 
   //Sjekker om en client har kobla til
   WiFiClient client = server.available();
@@ -365,20 +362,11 @@ void loop() {
   Serial.println("Music start: " + req.indexOf("/cmd/MUSIC_PREVIOUS"));
 
   if (req.indexOf("/cmd/MUSIC_START") != -1){
-    softSerial.println("play");
-<<<<<<< HEAD
-    Serial.println("Play");
-  }
+    softSerial.println("play");}
+
   else if (req.indexOf("/cmd/MUSIC_STOP") != -1){
-    softSerial.println("plause");
-    Serial.println("Pause");
-  }
+    softSerial.println("pause");}
   else if(req.indexOf("/cmd/MUSIC_NEXT") != -1){
-=======
-  else if (req.indexOf("/cmd/MUSIC_STOP") != -1)
-    softSerial.println("pause");
-  else if(req.indexOf("/cmd/MUSIC_NEXT") != -1)
->>>>>>> ec72ddb29426f708690b018cd40eaac4185a3248
     softSerial.println("next song");
     Serial.println("Nxt song");
   }
