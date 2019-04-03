@@ -104,7 +104,7 @@ class WeatherForecast{
 
 
   public:
-    //funksjons som kalles på i starten av loppen, henter værdata fra yr og oppdatere de offentlige variablene.
+    //funksjons som kales på i starten av loppen, henter værdata fra yr og oppdatere de offentlige variablene.
     void opperate(){
       while(weather1 == "" && weather2 == "" && temperature1 == ""){//dette er for å sikre at funksjonen faktisk henter verdier fordi jeg kom over en bugg hvor det tok noen forsøk før den hentet verdiene
         yield();
@@ -113,16 +113,18 @@ class WeatherForecast{
         tempValue = ""; // Midlertidig verdi
         charValue = ""; // Verdi på tegnet som nå ligger i buffer fra XML
         dataValue = ""; // Verdien hentet ut på det vi ønsker oss.
+        //reseter verdiene for værinformasjon
         temperature1 = "";
         weather1 = "";
         temperature2 = "";
         weather2 = "";
         timefrom = "";
 
+        //skriver ut til en pc hvor den kobler seg til, for feilsøking når høytaleren er ferdig
         Serial.print("connecting to ");
         Serial.println(host);
 
-        // Use WiFiClient class to create TCP connections
+        // Bruker WiFiClient til å koble seg til yr via TCP tilkobling. Sender meldig hvis den ikke klarer å koble seg til
         WiFiClient client;
         const int httpPort = 80;
         if (!client.connect(host, httpPort)) {
@@ -137,7 +139,7 @@ class WeatherForecast{
         Serial.print("Requesting URL: ");
         Serial.println(url);
 
-        // This will send the request to the server
+        //Sender forespørsel til sørveren om å få xml filen
         client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                      "Host: " + host + "\r\n" +
                      "Connection: close\r\n\r\n");
@@ -147,27 +149,22 @@ class WeatherForecast{
 
         //memset( &inString, 0, 32 ); //clear inString memory
 
+        /*leser av xml filen og letter etter værdataen
+        ---------------------------------------------
+        ---------------------------------------------*/
         while(client.available()){
-          yield(); //yield er for å forhindre DVM problemer som er at en klokke må oppdateres. Dette går automatisk når loop går runden men ikke inni loopen så på grunn av at while kan ta litt tid bør man bruke denne for å ungå kresjer
+          yield(); //yield brukes fordi nodemcuen gjør en del bakgrunnsprosseser som har med å behandle tcp og ip tilkoblinger. Disse gjøres i starten av loopen men vis de ikke blir gjort på en stund restarter nodemcuen seg og yield gjør disse funksjonene.
 
-          //String line = client.readStringUntil('\r');
-          //Serial.print(line);
-
-
-
-          char c = client.read();
-          //displayInfo(c);
-
-
+          char c = client.read(); //leser av en bokstav i xml filen
 
            if (c == '<' ) { // Sjekk om vi har starten på en xml node
-              startRead = true; // i såfall, la oss lese inn
+              startRead = true; //hvis det er tilfelet må vi starte å se etter de ønskede verdiene.
             }
 
-            //Kort forklart - leser XML fra yr tegn for tegn. Om den finner tegnet < er det starten på en XML-node. Leser så inn XML
-            //noden inn i en streng. Sjekker så, for hvert tegn, om strengen innholder kombinasjonen av tegn vi ønsker oss. Om den
-            // finner kombinasjonen av tegn, begynner den å lese ut / lagre funnet data. Bruker så stage til å sjekke hvor vi er i
-            // xml og tilegner den utleste verdien til en variabel (vær, temperatur, eller tidspunkt.)
+            /*leser XML fra yr tegn for tegn. Om den finner tegnet < er det starten på en XML-node. Leser så inn XML
+            noden inn i en streng. Sjekker så, for hvert tegn, om strengen innholder kombinasjonen av tegn vi ønsker oss. Om den
+            finner kombinasjonen av tegn, begynner den å lese ut / lagre funnet data. Bruker så stage til å sjekke hvor vi er i
+             xml og tilegner den utleste verdien til en variabel (vær, temperatur, eller tidspunkt.)*/
 
             // leser inn innhold til en streng
             if(startRead == true){
@@ -180,22 +177,17 @@ class WeatherForecast{
                  if(tempValue.indexOf("numberEx=") > 0)
                   {
                      if (c == '"' && dataValue != "=" ) {
-                      //Serial.println(tempValue);
-                      //Serial.println("Fant ver");
                       startRead = false; // slutt å lese
-                      //Serial.println(dataValue); // skriv ut linjen til skjerm
                       tempValue = ""; // nullstill streng
                       stringPos = 0; // Nullstill teller+
 
                       stage++;
 
                      }else{
-
                        if (c == '"' && dataValue == "=" ){
-                        dataValue="";
+                        dataValue=""; //reseter stringen sånn at den er klar for bruk.
                       }else{
-
-                      dataValue = dataValue + charValue;
+                      dataValue = dataValue + charValue; //legger karakteren som ble lest av denne syklusen til stringen som inneholder innformasjonen
                      }
                      }
                   }
@@ -205,9 +197,7 @@ class WeatherForecast{
                 if(tempValue.indexOf("temperature") > 0 && stringPos > 35)
                   {
                      if (c == '"' ) {
-                      //Serial.println("Fant grader");
                       startRead = false; // slutt å lese
-                      //Serial.println("dataValue: "+dataValue); // skriv ut linjen til skjerm
 
                       tempValue = ""; // nullstill streng
                       stringPos = 0; // Nullstill teller+
@@ -223,9 +213,7 @@ class WeatherForecast{
                if(tempValue.indexOf("time from=") > 0 && stringPos > 23 && weather1!="" && timefrom=="")
                   {
                      if (stringPos == 26 ) {
-                      //Serial.println("Fant tidsinterval");
                       startRead = false; // slutt å lese
-                      //Serial.println("dataValue: "+dataValue); // skriv ut linjen til skjerm
 
                       tempValue = ""; // nullstill streng
                       stringPos = 0; // Nullstill teller+
@@ -240,17 +228,14 @@ class WeatherForecast{
 
               if (c == '>' ) { // ferdig med en xml-node
                 startRead = false; // slutt å lese
-                //Serial.println(tempValue); // skriv ut linjen til konsoll
                 tempValue = ""; // nullstill streng
                 stringPos = 0; // Nullstill teller
               }
 
-              //Stages
 
-
+            //lagrer informasjonen som er i stringen i de riktige variablene.
             if(stage==1 && weather1==""){
                weather1=getWeatherText(dataValue);
-               Serial.println("weather 1 innside" + weather1);
                dataValue="";
               }else if(stage==2 && temperature1==""){
                temperature1=dataValue;
@@ -272,14 +257,13 @@ class WeatherForecast{
             }
 
           // end
-
-
         }
-
         Serial.println("closing connection");
     }};
-}; //inneholder funksjonen opperate som henter værdata og tar et argument som er urlen. Den inneholder også alle variablene for værdata
-WeatherForecast weatherForecast("/place/Norway/Oslo/Oslo/Kværnerveien/varsel.xml");
+};
+
+
+WeatherForecast weatherForecast("/place/Norge/Buskerud/Drammen/Drammen_videregående_skole/varsel.xml"); //lager et objekt til classen weatherForecast med 1 argument som er urlen til der vi ønsker å hente værdata fra
 
 
 void setup() {
@@ -289,42 +273,47 @@ void setup() {
   //kobler til wifi
   if (WiFi.status() != WL_CONNECTED){
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED){Serial.println("not connected to wifi"); yield();} //sikrer at man ikke går videre med koden før wifi er koblet til
+    while (WiFi.status() != WL_CONNECTED){
+      Serial.println("not connected to wifi");
+      yield();} //sikrer at man ikke går videre med koden før wifi er koblet til
     }
 
   //gjør klar skjermen
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
 
-  // Start the server
+  //starter sørveren
   server.begin();
   Serial.println("Server started");
   Serial.println(WiFi.localIP());
 
-  //viser ip addressen på skjermen helt til ultralydsensoren registrer at hånden er over sensoren
+  /*viser ip addressen på skjermen helt til ultralydsensoren registrer at hånden er over sensoren
+  ----------------------------------------
+  ----------------------------------------*/
   boolean showIpAddress = true;
   while (showIpAddress){
     if (softSerial.available()>0){
-      serialInfo = softSerial.readStringUntil('\n');
+      serialInfo = softSerial.readStringUntil('\n'); //leser av serial informasjon man får fra arduinoen
     }
-    if (serialInfo.indexOf("stop ip") != -1){
+    if (serialInfo.indexOf("stop ip") != -1){ //venter til man får beskjed fra arduinoen om at noe har vært over ultralydsensoren før man går videre med koden
       showIpAddress = false;
-
-    } //stopper å vise det på skjermen vis ultralydsensoren blir aktivert
+    }
 
     //legge til kode for å stoppe det hvis man kobler til appen
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //ta med: softSerial.println("appConnected");
 
+    //gjør klar skjermen for at man kan skrive på den
     display.clearDisplay(); //fjerner all informasjon på skjermen
-    display.setTextSize(2);      // størelsen på teksten
-    display.setTextColor(WHITE); // Draw white text
-    display.setCursor(0, 0);     // Start at top-left corner
-    display.cp437(true);
-    //display.println("ip: " + wifi.localIP());
+    display.setTextSize(2);      // setter størelsen på teksten
+    display.setTextColor(WHITE); // spesifiserer fargen på teksten
+    display.setCursor(0, 0);     //sier hvor man skal starte å skrive teksten
+    display.cp437(true);         //spesifiserer fonten
+
+    //skriver ut ip adressen på skjermen
     display.println("ip");
     display.println(WiFi.localIP());
-    display.display();
+    display.display(); //oppdaterer innholdet på skjermen
   }
   display.clearDisplay();
   display.display();
@@ -332,9 +321,9 @@ void setup() {
 
 void loop() {
 
-  weatherForecast.opperate(); //henter værdata
+  weatherForecast.opperate(); //henter værdata fra yr.
 
-  //Sjekker om en client har kobla til
+  //Sjekker om en client har kobla til nodemcuen
   WiFiClient client = server.available();
   if (!client) {
     return;
@@ -344,12 +333,12 @@ void loop() {
   softSerial.println("appConnected");
   Serial.println("appConnected");
 
-  //seral kommunikasjon med arduinoen
+  //leser av informasjonen som er sent fra arduinoen.
   if (softSerial.available()>0){
     serialInfo = softSerial.readStringUntil('\n');
   }
 
-  //sjekker om informasjonen som ble sent er en volum oppdatering
+  //sjekker om informasjonen som ble sent er en volum oppdatering og oppdaterer volumet
   if (serialInfo.indexOf("volume:")!= -1){
   volume = serialInfo.substring(7 + serialInfo.indexOf("volume:")).toInt();
   lastVolume = volume;
@@ -402,12 +391,12 @@ void loop() {
 
 
 
-  //skriver ut til skjermen
+  //skriver ut værdata til skjermen
   display.clearDisplay(); //fjerner all informasjon på skjermen
   display.setTextSize(2);      // størelsen på teksten
-  display.setTextColor(WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.cp437(true);
+  display.setTextColor(WHITE); // skriver hvit tekst
+  display.setCursor(0, 0);     // starter i øverste venstre hjørne
+  display.cp437(true);  //spesifisererer fonten
   display.print(F("grader:"));
   display.println(weatherForecast.temperature1);
   display.println(weatherForecast.weather1);
