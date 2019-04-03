@@ -1,31 +1,38 @@
-//biblioteker for å hente data fra yr
+//biblioteker for å bruke nodemcuen til å hente data fra webservere
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
-//biblioteker for skjermen
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+//biblioteker for å kommunisere med skjermen
+#include <Wire.h> //bygd inn bibliotek for kommunikasjon via i2c protokollen
+#include <Adafruit_GFX.h> //bibliotek for å kontrollere skjermen
+#include <Adafruit_SSD1306.h> //bibliotek for å kontrollere skjermen
 
-//for komunikasjon med arduinoen
+//bibliotek for å kommunsiere med arduinoen ved å bruke serial over vanlige digitale pinner
 #include <SoftwareSerial.h>
-#define rxpin 2 //D4
-#define txpin 0 //D3
-SoftwareSerial softSerial = SoftwareSerial(rxpin, txpin);
+
+//setter opp serial kommunikasjon med arduinoen
+#define rxpin 2 //D4, porten for å ta imot informasjon fra arduinoen
+#define txpin 0 //D3, porten for å sende informasjon til arduinoen
+SoftwareSerial softSerial = SoftwareSerial(rxpin, txpin); //lager et objekt til biblioteket sofwareSerial sånn at vi kan kommunisere med arduinoen
+
+//verdier for å lagre og justere volumet på arduinoen og appen.
 int volume = 0; //verdien som kommer via serial porten er volumet som skal vises på skjermen
 int lastVolume = 0;
-String serialInfo = ""; //informasjon som sendes via serialporten
+
+String serialInfo = ""; //lagrer det som leses av serial porten
+
 WiFiServer server(80);
 
-char* ssid = "HilmirNett";
-char* password = "12345678";
+char* ssid = "HilmirNett"; //ssiden til nettverket vi ønsker å koble oss til
+char* password = "12345678"; //passordet til nettverket vi ønsker å koble oss til
 
 
-//skaper et objekt for skjermen
+//skaper et objekt for skjermen og includerer det inbygde biblioteket Wire for i2c kommunikasjon
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
-//klasse for å hente data fra yr, ble gjort fordi det da er mindre sjanse for å rotte det til hvis vi får den andre skjermen. Da er dette veldig oversiktelig og greit.
+//klasse for å hente data fra yr
 class WeatherForecast{
+  //ofentlige verdier dette er hvor vi lagrer dataene vi henter fra yr
   public:
     String url;
     String temperature1;
@@ -35,6 +42,7 @@ class WeatherForecast{
     String timefrom;
     String host = "www.yr.no";
 
+  //private verdier som brukes for å lete gjennom xml filen
   boolean startRead = false;
   int stringPos;
   int stage;
@@ -42,10 +50,12 @@ class WeatherForecast{
   String charValue;
   String dataValue;
 
+  //funksjon som går med en gang nodemcuen starter sånn at vi kan skafe urlen til det stedet vi vil hente informasjon fra.
   WeatherForecast(String url1){
     url = url1;
   }
 
+  //privat funksjon for å sende inn kode for hva slags vær det er. Returnerer en string med hva været er.
   String getWeatherText(String weatherNumber){
     if(weatherNumber=="1"){return  "Sol";}
     if(weatherNumber=="2"){return  "Lett-  skyet";}
@@ -94,6 +104,7 @@ class WeatherForecast{
 
 
   public:
+    //funksjons som kalles på i starten av loppen, henter værdata fra yr og oppdatere de offentlige variablene.
     void opperate(){
       while(weather1 == "" && weather2 == "" && temperature1 == ""){//dette er for å sikre at funksjonen faktisk henter verdier fordi jeg kom over en bugg hvor det tok noen forsøk før den hentet verdiene
         yield();
