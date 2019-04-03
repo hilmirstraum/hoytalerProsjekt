@@ -384,7 +384,7 @@ void loop() {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
 
-  //oppdaterer volumet til arduinoen hvis noe et annet sted i koden har endret på volumet
+  //oppdaterer volumet til arduinoen hvis volumet er endret
   if (lastVolume != volume){
     softSerial.println(volume);
     lastVolume = volume;}
