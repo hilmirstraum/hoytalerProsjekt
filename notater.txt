@@ -13,3 +13,9 @@ last song
 appConnected
 appDisconnected
 stop ip				forteller at man skal stoppe å vise ip addressen på skjermen
+
+play: 4
+vol-: 5
+vol+: 6
+DN: 7
+UP: 8

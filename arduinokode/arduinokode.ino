@@ -1,11 +1,11 @@
 #include <SoftwareSerial.h>
 
 //definering av forskjellige porter sånn at vi kan sikte til de senere i koden uten at de må ta opp minne på arduinoen.
-#define volumeDown 4 //port for å skru volumet på Bluethootkortet ned
-#define volumeUp 5 //port for å skru volumet på Bluethootkortet opp
-#define skipSong 7 //port for å gå til neste sang
-#define lastSong 8 //port for å gå tilbake til forrige sang
-#define playPin 6 //port for å pause og stoppe sangen
+#define volumeDown 5 //port for å skru volumet på Bluethootkortet ned
+#define volumeUp 6 //port for å skru volumet på Bluethootkortet opp
+#define skipSong 8 //port for å gå til neste sang
+#define lastSong 7 //port for å gå tilbake til forrige sang
+#define playPin 4 //port for å pause og stoppe sangen
 #define echoPin 12 //port for å motta signaler fra ultralyden
 #define trigerPin 13 //port for å sende signaler til ultralyden
 #define rxPin 3 //port for å motta serial informasjon fra nodemcuen
