@@ -216,8 +216,4 @@ void loop(){
         newVolume = 100;}
       else if (newVolume < 0){
         newVolume = 0;}
-      Serial.print(volume);
-      Serial.print("   ");
-      Serial.println(newVolume);
-        
         }
