@@ -61,9 +61,10 @@ void loop(){
   //leser av informasjonen som kommer fra nodemcuen og putter det i en string
   if (softSerial.available()>0){
     serialInfo = softSerial.readStringUntil('\n'); //bruker readStringUntil for å sikre at den bare leser av en linje av gangen.
+    Serial.println(serialInfo);
   }
   //oppdatere volumet på arduinoen hvis det er blitt endret av appen
-  if (serialInfo.indexOf("volume:" != -1)){
+  if (serialInfo.indexOf("volume:") != -1){
   newVolume = serialInfo.substring(7 + serialInfo.indexOf("volume:")).toInt();}
 
   //oppdaterer om appen er koblet til høytaleren
@@ -215,4 +216,8 @@ void loop(){
         newVolume = 100;}
       else if (newVolume < 0){
         newVolume = 0;}
+      Serial.print(volume);
+      Serial.print("   ");
+      Serial.println(newVolume);
+        
         }
