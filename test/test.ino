@@ -49,7 +49,7 @@ void loop(){
 
     if (volume == newVolume){
       delay(500);
-      if (volume = 100){
+      if (volume == 100){
         newVolume=0;
       }
       else{newVolume += 10;}
