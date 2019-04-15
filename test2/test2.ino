@@ -47,21 +47,13 @@ void loop(){
       digitalWrite(volumeUp, LOW);
       volumeChangeStartTime = 0;}}
 
-    if (newVolume == 100 && volume == 100){
-        newVolume=0;
-        Serial.println("volume: 100 endrer til 0")
-        delay(1000);
 
-    }
-    else if (newVolume == 50 && volume == 50){
-        newVolume=100;
-        Serial.println("volume: 50 endrer til 100")
-        delay(1000)
-    }
-    else if (newVolume == 0 && volume == 0){
-        newVolume=50;
-        Serial.println("volume: 0 endrer til 50")
-        delay(1000);
-
-    }
+          if (volume == newVolume){
+            delay(500);
+            if (volume = 100){
+              newVolume=0;
+            }
+            else{newVolume += 10;}
+            Serial.println(newVolume);
+          }
 }
