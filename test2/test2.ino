@@ -2,9 +2,6 @@
 //definering av forskjellige porter sånn at vi kan sikte til de senere i koden uten at de må ta opp minne på arduinoen.
 #define volumeDown 5 //port for å skru volumet på Bluethootkortet ned
 #define volumeUp 6 //port for å skru volumet på Bluethootkortet opp
-#define volume100 3
-#define volume50 4
-#define volume0 5
 
 
 int volume = 100; //faktiske volumet i prosent
@@ -52,20 +49,19 @@ void loop(){
 
     if (newVolume == 100 && volume == 100){
         volume=0;
-        digitalWrite(volume100, HIGH);
+        Serial.println("volume: 100 endrer til 0")
         delay(1000);
-        digitalWrite(volume100, LOW);
+
     }
     else if (newVolume == 50 && volume == 50){
         volume=100;
-        digitalWrite(volume50, HIGH);
-        delay(1000);
-        digitalWrite(volume50, LOW);
+        Serial.println("volume: 50 endrer til 100")
+        delay(1000)
     }
     else if (newVolume == 0 && volume == 0){
         volume=50;
-        digitalWrite(volume0, HIGH);
+        Serial.println("volume: 0 endrer til 50")
         delay(1000);
-        digitalWrite(volume0, LOW);
 
-    } //oppadeter volumet på nodemcuen
+    }
+}
