@@ -127,7 +127,6 @@ void loop(){
     digitalWrite(volumeUp, HIGH);
     if ((newVolume - volume)*50 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
       volume = newVolume;
-      if (newVolume == 100){}
       digitalWrite(volumeUp, LOW);
       volumeChangeStartTime = 0;
       softSerial.println(newVolume);}}} //oppadeter volumet på nodemcuen
