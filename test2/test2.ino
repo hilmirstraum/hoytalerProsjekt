@@ -47,29 +47,25 @@ void loop(){
     digitalWrite(volumeUp, HIGH);
     if ((newVolume - volume)*50 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
       volume = newVolume;
-      if (newVolume == 100){}
       digitalWrite(volumeUp, LOW);
       volumeChangeStartTime = 0;}}
 
-    if (newVolume == 100){
-      if (volume == 100){
+    if (newVolume == 100 && volume == 100){
         volume=0;
         digitalWrite(volume100, HIGH);
         delay(1000);
-        digitalWrite(volume100, LOW);}
+        digitalWrite(volume100, LOW);
     }
-    else if (newVolume == 50){
-      if (volume == 50){
+    else if (newVolume == 50 && volume == 50){
         volume=100;
         digitalWrite(volume50, HIGH);
         delay(1000);
-        digitalWrite(volume50, LOW);}
+        digitalWrite(volume50, LOW);
     }
-    else if (newVolume == 0){
-      if (volume == 0){
+    else if (newVolume == 0 && volume == 0){
         volume=50;
-        digitalWrite(volume100, HIGH);
+        digitalWrite(volume0, HIGH);
         delay(1000);
-        digitalWrite(volume100, LOW);}
+        digitalWrite(volume0, LOW);
 
     } //oppadeter volumet på nodemcuen

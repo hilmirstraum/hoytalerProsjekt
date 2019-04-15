@@ -23,10 +23,6 @@ void setup(){
   }
 
 void loop(){
-
-  /*justering av volum
-  --------------------
-  --------------------*/
   //justering av volumet på Bluethootkortet
   if (volume != newVolume && volumeChangeStartTime == 0){
     volumeChangeStartTime = millis();} //starter en klokke som forteller når vi startet å endre volumet
@@ -47,7 +43,6 @@ void loop(){
     digitalWrite(volumeUp, HIGH);
     if (((newVolume - volume)^0.5/2)*1000 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
       volume = newVolume;
-      if (newVolume == 100){}
       digitalWrite(volumeUp, LOW);
       volumeChangeStartTime = 0;}}
 
@@ -69,9 +64,9 @@ void loop(){
     else if (newVolume == 0){
       if (volume == 0){
         volume=50;
-        digitalWrite(volume100, HIGH);
+        digitalWrite(volume0, HIGH);
         delay(1000);
-        digitalWrite(volume100, LOW);}
+        digitalWrite(volume0, LOW);}
     }
 
-    } //oppadeter volumet på nodemcuen
+    }
