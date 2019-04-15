@@ -17,9 +17,6 @@ void setup(){
   Serial.begin(9600);
   pinMode(volumeDown, OUTPUT);
   pinMode(volumeUp, OUTPUT);
-  pinMode(volume100, OUTPUT);
-  pinMode(volume50, OUTPUT);
-  pinMode(volume0, OUTPUT);
   }
 
 void loop(){
@@ -31,7 +28,7 @@ void loop(){
   if (newVolume < volume){
     digitalWrite(volumeUp, LOW);
     digitalWrite(volumeDown, HIGH);
-    if (((volume - newVolume)^0.5/2)*1000 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
+    if ((pow((volume-newVolume), 0.5)/2)*1000 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
       volume = newVolume;
       digitalWrite(volumeDown, LOW);
       volumeChangeStartTime = 0; //oppdaterer volumet til nodemcuen.
@@ -41,7 +38,7 @@ void loop(){
   else if (newVolume > volume){
     digitalWrite(volumeDown, LOW);
     digitalWrite(volumeUp, HIGH);
-    if (((newVolume - volume)^0.5/2)*1000 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
+    if ((pow((newVolume - volume), 0.5)/2)*1000 < (millis())-volumeChangeStartTime){ //beregner om singalet er sendt lenge nok til at den er ferdig med endringne i volumet
       volume = newVolume;
       digitalWrite(volumeUp, LOW);
       volumeChangeStartTime = 0;}}

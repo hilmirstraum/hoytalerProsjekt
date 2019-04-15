@@ -48,12 +48,12 @@ void loop(){
       volumeChangeStartTime = 0;}}
 
 
-          if (volume == newVolume){
-            delay(500);
-            if (volume == 100){
-              newVolume=0;
-            }
-            else{newVolume += 10;}
-            Serial.println(newVolume);
-          }
+    if (volume == newVolume){
+      delay(500);
+      if (volume == 100){
+        newVolume=0;
+      }
+      else{newVolume += 10;}
+      Serial.println(newVolume);
+    }
 }
